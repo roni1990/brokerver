@@ -1,0 +1,129 @@
+# Copyright (c) 2014, 2023, Oracle and/or its affiliates.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License, version 2.0,
+# as published by the Free Software Foundation.
+#
+# This program is also distributed with certain software (including
+# but not limited to OpenSSL) that is licensed under separate terms,
+# as designated in a particular file or component or in included license
+# documentation.  The authors of MySQL hereby grant you an additional
+# permission to link the program and your derivative works with the
+# separately licensed software that they have included with MySQL.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License, version 2.0, for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+#
+# The MySQL  Server configuration file.
+#
+# For explanations see
+# http://dev.mysql.com/doc/mysql/en/server-system-variables.html
+
+
+# REVIEW
+# ver 1.1 (05/10/2023)  r.rutigliano
+# ver 1.2 (06/11/2023)  r.rutigliano
+#          innodb_lru_scan_depth = 256
+# ver 1.3 (09/11/2023)  r.rutigliano
+#          max_allowed_packet = 64M
+
+
+[mysqld]
+# pid-file        = /var/run/mysqld/mysqld.pid
+# socket          = /var/run/mysqld/mysqld.sock
+# datadir         = /var/lib/mysql
+log-error       = /usr/local/mysql/error.log
+
+#log-slow-queries = /var/log/mysql/mysql-slow.log
+#long_query_time = 2
+
+# By default we only accept connections from localhost
+#bind-address    = 127.0.0.1
+bind-address    = 0.0.0.0
+
+# Disabling symbolic-links is recommended to prevent assorted security risks
+symbolic-links=0
+
+#per clienti che hanno jdk1.7 dobbiamo attivare anche TLSv1.1
+tls_version=TLSv1.2,TLSv1.3
+
+#**** CONFIGURAZIONI PER BROKERVER *****
+
+#default_character_set=utf8 - va in conflitto con character_set_server
+#default_value 'character-set-server=latin1'
+character_set_server		= utf8
+
+#default_value collation-server = latin1_swedish_ci'
+collation_server = utf8_general_ci
+
+#init-connect='SET NAMES utf8' / default_value 'empty'
+#expire-logs-days=1 / default_value '0'
+#binlog_format = ROW / same as default value
+
+#default_value 'max_connections  = 151'
+max_connections              = 500
+
+#default_value 'key_buffer_size = 8388608' / other servers 512M
+#key_buffer_size is the size of the buffer used for index blocks. The key buffer is also known as the key cache.
+#key_buffer_size can be increased or decreased only in increments or multiples of 4096 byte
+key_buffer_size		= 64M
+
+#default_value 'max_allowed_packet	= 4194304'
+#ver 1.3 
+#max_allowed_packet 		= 16M
+max_allowed_packet 			= 64M
+
+#default_value sort_buffer_size = 262144 / other server 1024M
+sort_buffer_size 			= 10M
+
+#lower_case_table_names=1 / default value '0'
+lower_case_table_names=1
+
+#default_value tmp_table_size           = 16777216
+tmp_table_size                          = 64M
+
+#default_value max_heap_table_size      = 16777216
+max_heap_table_size                     = 64M
+
+#ver 1.2
+#default value innodb_lru_scan_depth = 1024
+#innodb_lru_scan_depth * innodb_buffer_pool_instances defines the amount of work performed by the page cleaner thread each second. 
+#reducing innodb_lru_scan_depth from 1024 to 256. This reduces how far into the buffer pool the page cleaner thread searches for dirty pages during its once-per-second cycle. You're asking it to take smaller bites. 
+innodb_lru_scan_depth = 256
+
+
+#PURGE
+#InnoDB does not physically remove a row from the database immediately when you delete it with an SQL statement. A row and its index records are only physically removed when InnoDB discards the undo log record #written for the deletion. This removal operation, which only occurs after the row is no longer required for multi-version concurrency control (MVCC) or rollback, is called a purge.
+#innodb_purge_threads      The default value is 4.
+#The innodb_purge_batch_size variable defines the number of undo log pages that purge parses and processes in one batch from the history list.
+#innodb_purge_batch_size   The default value is 300.
+
+
+default_storage_engine = innodb
+
+#innodb_buffer_pool_size default value = 128M
+#innodb_buffer_pool_size= (massimo 60%-80% total RAM)
+innodb_buffer_pool_size= 256M
+
+sql_mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+innodb_strict_mode             = 0
+
+#net_buffer_length 			= 8K / default_value net_buffer_length 			= 16384
+#read_buffer_size 			= 256K / default_value read_buffer_size 			= 131072
+#read_rnd_buffer_size 		= 512K / default_value read_rnd_buffer_size 		= 262144
+#myisam_sort_buffer_size 	= 8M / default_value myisam_sort_buffer_size 	= 8388608
+#optimizer_search_depth=0 / default_value '62'
+#thread_stack                            = 192K / default_value thread_stack                            = 262144
+#query_cache_limit                       = 2M / default_value query_cache_limit                       = 1048576
+#query_cache_size                        = 8M / default_value query_cache_size                        = 1048576
+#query_cache_type                        = 1 / default_value query_cache_type                        = OFF
+#thread_cache_size                       = 8 / default_value thread_cache_size                       = 9
+# this is the default, increase it if you have lots of tables
+#innodb_additional_mem_pool_size = 2M
